@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>query</title>
+	<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+<!-- 	<style type="text/css">
+		div#input {
+			float: left;
+	    	margin-right: 30em;
+		}
+	</style> -->
+</head>
+<body>
+<div>
+	<select name="user_name" id="user_name">
+		{% for user in users %}
+			<option value="{{ user.username }}">{{ user.username }}</option>
+		{% endfor %}
+	</select>
+
+
+	<select name="app_id" id="app_id">
+		{% for app in apps %}
+			<option value="{{ app.appid }}">{{ app.name }}||{{ app.appid }}</option>
+		{% endfor %}
+	</select>
+
+	<button id="btn">查询</button>
+</div>
+
+<div id="exist_roles">
+	
+</div>
+</body>
+<script type="text/javascript">
+	$('#btn').click(function() {
+		$('#exist_roles').empty();
+		console.log("user_name:"+$("#user_name").val());
+		console.log("app_id:"+$("#app_id").val());
+		data={"app_name":$("#app_id").val(), "user_name": $("#user_name").val()};
+		console.log(data);
+		$.ajax({
+			type: "POST",
+			url: "http://"+window.location.host+"/permission/query/",
+			// contentType:'application/json;charset=utf-8',
+			data: JSON.stringify(data),
+
+			dataType: "json",
+			success: function(recv_data){
+				// var child = <input type="checkbox" name="role_id" value="" checked="checked"/>;
+				console.log(recv_data);
+				// console.log(recv_data['all_roles'][0]['rolename']);
+
+				var all_roles = recv_data['all_roles'];
+				var exist_roles = recv_data['exist_roles'];
+				for(x in all_roles){
+					// console.log(all_roles[x]['rolename']);
+					role = all_roles[x]
+					if( exist_roles.indexOf(role['id']) != -1 ){
+						console.log(role['rolename']);
+						var child_dom = '<div id="input"><input type="checkbox" id="'+ role['id'] +'" checked="checked" onclick="update_role('+role['id']+')"/>'+ role['rolename'] +'</div>';
+					}else{
+						var child_dom = '<div id="input"><input type="checkbox" id="'+ role['id'] +'" onclick="update_role('+role['id']+')"/>'+ role['rolename'] +'</div>';
+					}
+					$('#exist_roles').append(child_dom);
+				}
+			}
+		});
+	})
+
+	function update_role(role_id){
+		var target = '#' + role_id;
+		// console.log(target);
+		// console.log($(target));
+		var user_name = $("#user_name").val();
+		var data = {"role_id":role_id, "user_name": user_name};
+		if($(target).get(0).checked){
+			console.log("checked");
+			data.fun='add';
+			// 添加权限
+		}else{
+			// 取消权限
+			data.fun='revoke';
+			console.log("not checked");
+		}
+
+		$.ajax({
+			type: "POST",
+			url: "http://"+window.location.host+"/permission/update/",
+			data: JSON.stringify(data),
+			dataType: "json",
+			success: function(recv_data){
+				console.log("update res: "+recv_data['status'] + "   msg:  " + recv_data['msg']);
+				
+			}
+		});
+
+	}
+</script>
+
+</html>
