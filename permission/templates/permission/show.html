@@ -2,6 +2,7 @@
 <html>
 <head>
 	<title>show</title>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
 </head>
 <body>
 	{% csrf_token %}
@@ -9,18 +10,41 @@
 	{% for role in all_roles %}
 		{% if role.id in have_roles %}
 		<div>
-		<input type="checkbox" name="role_id" value="{{ role.id }}" checked="checked" onclick="update_role({{ role.id }},'{{ user_name }}')">{{ role.rolename }}
+		<input type="checkbox" name="role_id" id="{{ role.id }}" checked="checked" onclick="update_role({{ role.id }},'{{ user_name }}')">{{ role.rolename }}
 		</div>
 		{% else %}
 		<div>
-		<input type="checkbox" name="role_id" value="{{ role.id }}" onclick="update_role({{ role.id }},'{{ user_name }}')">{{ role.rolename }}
+		<input type="checkbox" name="role_id" id="{{ role.id }}" onclick="update_role({{ role.id }},'{{ user_name }}')">{{ role.rolename }}
 		</div>
 		{% endif %}
 	{% endfor %}
 </body>
 <script type="text/javascript">
-	function update_role(role_id, role_name){
-		console.log("role_id: " + role_id +"|| role_name: " + role_name)
+
+	function update_role(role_id, user_name){
+		var target = '#' + role_id;
+		var data = {"role_id":role_id, "user_name": user_name};
+		if($(target).get(0).checked){
+			console.log("checked");
+			data.fun='add';
+			// 添加权限
+		}else{
+			// 取消权限
+			data.fun='revoke';
+			console.log("not checked");
+		}
+        console.log(data)
+		$.ajax({
+			type: "POST",
+			url: "http://"+window.location.host+"/permission/update/",
+			data: JSON.stringify(data),
+			dataType: "json",
+			success: function(recv_data){
+				console.log("update res: "+recv_data['status'] + "   msg:  " + recv_data['msg']);
+
+			}
+		});
+
 	}
 </script>
 </html>

@@ -105,9 +105,11 @@ def update(request):
 			res_data['msg'] = res
 		elif data['fun'] == 'add':
 			print("-------------%s" % data['fun'])
-			res =  Userrole.objects.filter(roleid=data['role_id'], userid=data['user_name'], isdeleted=0).annotate(count=Count('id')).values('count')
+			res = Userrole.objects.filter(roleid=data['role_id'], userid=data['user_name'], isdeleted=0).annotate(count=Count('id')).values('count')
+			print(res.query)
+			print(res)
 
-			if res[0]['count'] >= 1:
+			if res and res[0]['count'] >= 1:
 				res_data['msg'] = '权限已经存在'
 				return JsonResponse(res_data)
 

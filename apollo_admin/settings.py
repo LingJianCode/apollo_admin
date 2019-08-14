@@ -85,9 +85,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'ApolloPortalDB',
-        'USER':'xxxxxx',
-        'PASSWORD':'xxxxx',
-        'HOST':'x.x.x.x',
+        'USER':'xxx',
+        'PASSWORD':'xxx',
+        'HOST':'xxx.xxx.xxx.xxx',
         'PORT':'3306',
     }
 }
